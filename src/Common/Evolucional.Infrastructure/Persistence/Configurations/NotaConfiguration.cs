@@ -9,8 +9,7 @@ namespace Evolucional.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Nota> builder)
         {
             builder.Property(t => t.Valor)
-                .HasPrecision(2)
-                .HasMaxLength(4)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(t => t.DisciplinaId)

@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Security.Claims;
 using System.Text;
 using System.Threading;
@@ -13,6 +15,7 @@ using Evolucional.WebApp.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
 
 namespace Evolucional.WebApp.Controllers
 {
@@ -128,31 +131,32 @@ namespace Evolucional.WebApp.Controllers
 
         public async Task<IActionResult> BotaoUm(string token, CancellationToken stoppingToken)
         {
-
-            string baseUrl = "https://localhost:44308";
-            AlunosClient alunosClient = new AlunosClient(baseUrl);
-            alunosClient.SetBearerToken(token);
-            //            var resultAlunos = alunosClient.GetAllAlunosAsync(stoppingToken);
-            //            if (resultAlunos.Result != null)
-            //            {
-            //                return RedirectToAction(nameof(LogedIn),
-            //new {notify =2, message = $"Já existem 1000 alunos cadastrados!!!", autenticado = true, token = token});
-            //            }
-
-
-            for (int i = 1; i <= 1000; i++)
+            try
             {
-                var command = new CreateAlunoCommand()
+                string baseUrl = "https://localhost:44308";
+                AlunosClient alunosClient = new AlunosClient(baseUrl);
+                alunosClient.SetBearerToken(token);
+                //            var resultAlunos = alunosClient.GetAllAlunosAsync(stoppingToken);
+                //            if (resultAlunos.Result != null)
+                //            {
+                //                return RedirectToAction(nameof(LogedIn),
+                //new {notify =2, message = $"Já existem 1000 alunos cadastrados!!!", autenticado = true, token = token});
+                //            }
+
+
+                for (int i = 1; i <= 1000; i++)
                 {
-                    Nome = $"Aluno{i}"
-                };
-                _ = await alunosClient.CreateAsync(command);
-            }
+                    var command = new CreateAlunoCommand()
+                    {
+                        Nome = $"Aluno{i}"
+                    };
+                    _ = await alunosClient.CreateAsync(command);
+                }
 
-            DisciplinasClient disciplinasClient = new DisciplinasClient(baseUrl);
-            disciplinasClient.SetBearerToken(token);
+                DisciplinasClient disciplinasClient = new DisciplinasClient(baseUrl);
+                disciplinasClient.SetBearerToken(token);
 
-            var list = new List<string>
+                var list = new List<string>
             {
                 "Matemática",
                 "Português",
@@ -165,47 +169,69 @@ namespace Evolucional.WebApp.Controllers
                 "Química"
             };
 
-            foreach (var item in list)
-            {
-                _ = await disciplinasClient.CreateAsync(new CreateDisciplinaCommand { Nome = item });
-            }
+                foreach (var item in list)
+                {
+                    _ = await disciplinasClient.CreateAsync(new CreateDisciplinaCommand { Nome = item });
+                }
 
-            disciplinasClient.SetBearerToken(token);
-            var listDisciplinas =
-                disciplinasClient.GetAllDisciplinasComPaginacaoAsync(
-                    new GetAllDisciplinasComPaginacaoQuery()
+                disciplinasClient.SetBearerToken(token);
+                var listDisciplinas =
+                    disciplinasClient.GetAllDisciplinasComPaginacaoAsync(
+                        new GetAllDisciplinasComPaginacaoQuery()
+                        {
+                            PageNumber = 1,
+                            PageSize = 10
+                        });
+
+                alunosClient.SetBearerToken(token);
+                var listAlunos =
+                    alunosClient.GetAllAlunosComPaginacaoAsync(
+                    new GetAllAlunosComPaginacaoQuery
                     {
                         PageNumber = 1,
-                        PageSize = 10
+                        PageSize = 2000
                     });
 
-            alunosClient.SetBearerToken(token);
-            var listAlunos =
-                alunosClient.GetAllAlunosComPaginacaoAsync(
-                new GetAllAlunosComPaginacaoQuery
-                {
-                    PageNumber = 1,
-                    PageSize = 2000
-                });
+                NotasClient notasClient = new NotasClient(baseUrl);
+                notasClient.SetBearerToken(token);
 
-            NotasClient notasClient = new NotasClient(baseUrl);
-            notasClient.SetBearerToken(token);
-
-            foreach (var aluno in listAlunos.Result.Data.Items)
-            {
-                foreach (var disciplina in listDisciplinas.Result.Data.Items)
+                foreach (var aluno in listAlunos.Result.Data.Items)
                 {
-                    _ = await notasClient.CreateAsync(new CreateNotaCommand()
+                    foreach (var disciplina in listDisciplinas.Result.Data.Items)
                     {
-                        AlunoId = aluno.Id,
-                        DisciplinaId = disciplina.Id,
-                        Valor = new Random().Next(11)
-                    });
+                        _ = await notasClient.CreateAsync(new CreateNotaCommand()
+                        {
+                            AlunoId = aluno.Id,
+                            DisciplinaId = disciplina.Id,
+                            Valor = new Random().Next(11)
+                        });
+                    }
                 }
-            }
 
-            return RedirectToAction(nameof(LogedIn),
-                new { notify = 0, message = $"1000 alunos foram cadastrados com sucesso!!!", autenticado = true });
+                return RedirectToAction(nameof(LogedIn),
+                    new { notify = 0, message = $"1000 alunos foram cadastrados com sucesso!!!", autenticado = true, token = token });
+            }
+            catch (Exception e)
+            {
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Root));
+                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(((Evolucional.WebApp.Client.SwaggerException)e).Response));
+                Root obj = (Root)serializer.ReadObject(ms);
+                var msg = string.Empty;
+                if (obj.error.code == 900)
+                {
+                    msg = string.Join(",", obj.data.Nome);
+                }
+                else
+                {
+                    msg = obj.error.message;
+                }
+                return RedirectToAction(nameof(LogedIn),
+                    new { notify = 2, message = msg, autenticado = true, token = token });
+
+                Console.WriteLine(e);
+                throw;
+            }
+            
         }
 
         public async Task<FileResult> BotaoDois(string token, CancellationToken stoppingToken)
@@ -220,6 +246,24 @@ namespace Evolucional.WebApp.Controllers
 
         }
 
+    }
+
+    public class Data
+    {
+        public List<string> Nome { get; set; }
+    }
+
+    public class Error
+    {
+        public string message { get; set; }
+        public int code { get; set; }
+    }
+
+    public class Root
+    {
+        public Data data { get; set; }
+        public bool succeeded { get; set; }
+        public Error error { get; set; }
     }
 
 }
