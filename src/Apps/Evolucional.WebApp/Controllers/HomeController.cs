@@ -14,8 +14,7 @@ using System.Threading.Tasks;
 using Evolucional.WebApp.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualBasic;
+using ClosedXML.Excel;
 
 namespace Evolucional.WebApp.Controllers
 {
@@ -136,13 +135,6 @@ namespace Evolucional.WebApp.Controllers
                 string baseUrl = "https://localhost:44308";
                 AlunosClient alunosClient = new AlunosClient(baseUrl);
                 alunosClient.SetBearerToken(token);
-                //            var resultAlunos = alunosClient.GetAllAlunosAsync(stoppingToken);
-                //            if (resultAlunos.Result != null)
-                //            {
-                //                return RedirectToAction(nameof(LogedIn),
-                //new {notify =2, message = $"Já existem 1000 alunos cadastrados!!!", autenticado = true, token = token});
-                //            }
-
 
                 for (int i = 1; i <= 1000; i++)
                 {
@@ -253,13 +245,59 @@ namespace Evolucional.WebApp.Controllers
             NotasClient notasClient = new NotasClient(baseUrl);
             notasClient.SetBearerToken(token);
 
-            StringBuilder sb = new StringBuilder();
+            //export em CSV
+            //StringBuilder sb = new StringBuilder();
 
-            sb.Append("AlunoId;Nome;Matemática;Português;História;Geografia;Inglês;Biologia;Filosofia;Física;Química;MÉDIA");
-            sb.Append("\r\n");
+            //sb.Append("AlunoId;Nome;Matemática;Português;História;Geografia;Inglês;Biologia;Filosofia;Física;Química;MÉDIA");
+            //sb.Append("\r\n");
 
+            //foreach (var aluno in listAlunos.Data.Items)
+            //{
+            //    var resultNotas = notasClient.GetAllNotasComPaginacaoAsync(new GetAllNotasComPaginacaoQuery()
+            //    {
+            //        PageNumber = 1,
+            //        PageSize = 9200,
+            //        AlunoId = aluno.Id
+            //    }).Result;
+
+            //    sb.Append(
+            //        $"{aluno.Id};" +
+            //        $"{aluno.Nome};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Matemática")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Português")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("História")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Geografia")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Inglês")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Biologia")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Filosofia")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Física")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Química")).ToList().Select(s => s.Valor).ToList())};" +
+            //        $"{ Convert.ToDecimal(resultNotas.Data.Items.Sum(s => s.Valor) / 9).ToString("F")};");
+            //    sb.Append("\r\n");
+            //}
+
+            //exporta em CSV
+            //return File(Encoding.Unicode.GetBytes(sb.ToString()), "text/csv", "Relatório.csv");
+
+            var dtDataBuffer = new System.Data.DataTable("buffer");
+
+            dtDataBuffer.Columns.Add("AlunoId", typeof(string));
+            dtDataBuffer.Columns.Add("Nome", typeof(string));
+            dtDataBuffer.Columns.Add("Matemática", typeof(string));
+            dtDataBuffer.Columns.Add("Português", typeof(string));
+            dtDataBuffer.Columns.Add("História", typeof(string));
+            dtDataBuffer.Columns.Add("Geografia", typeof(string));
+            dtDataBuffer.Columns.Add("Inglês", typeof(string));
+            dtDataBuffer.Columns.Add("Biologia", typeof(string));
+            dtDataBuffer.Columns.Add("Filosofia", typeof(string));
+            dtDataBuffer.Columns.Add("Física", typeof(string));
+            dtDataBuffer.Columns.Add("Química", typeof(string));
+            dtDataBuffer.Columns.Add("MÉDIA", typeof(string));
+            
             foreach (var aluno in listAlunos.Data.Items)
             {
+                List<string> rowData = new List<string> { };
+
                 var resultNotas = notasClient.GetAllNotasComPaginacaoAsync(new GetAllNotasComPaginacaoQuery()
                 {
                     PageNumber = 1,
@@ -267,24 +305,34 @@ namespace Evolucional.WebApp.Controllers
                     AlunoId = aluno.Id
                 }).Result;
 
-                sb.Append(
-                    $"{aluno.Id};" +
-                    $"{aluno.Nome};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Matemática")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Português")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("História")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Geografia")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Inglês")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Biologia")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Filosofia")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Física")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Química")).ToList().Select(s => s.Valor).ToList())};" +
-                    $"{ Convert.ToDecimal(resultNotas.Data.Items.Sum(s => s.Valor) / 9).ToString("F")};");
-                sb.Append("\r\n");
+                rowData.Add(aluno.Id.ToString());
+                rowData.Add(aluno.Nome);
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Matemática")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Português")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("História")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Geografia")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Inglês")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Biologia")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Filosofia")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Física")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(string.Join("", resultNotas.Data.Items.Where(x => x.Disciplina.Nome.Equals("Química")).ToList().Select(s => s.Valor).ToList()));
+                rowData.Add(Convert.ToDecimal(resultNotas.Data.Items.Sum(s => s.Valor) / 9).ToString("F"));
+
+                dtDataBuffer.Rows.Add(rowData.ToArray());
             }
 
-            return File(Encoding.Unicode.GetBytes(sb.ToString()), "text/csv", "Relatório.csv");
+            var memoryStream = new MemoryStream();
 
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add(dtDataBuffer, "Relatorio");
+                worksheet.Rows().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                worksheet.Rows().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                worksheet.Columns().AdjustToContents();
+                workbook.SaveAs(memoryStream);
+            }
+
+            return File(memoryStream.ToArray(), "application/vnd.ms-excel", "Relatorio.xlsx");
         }
 
     }
