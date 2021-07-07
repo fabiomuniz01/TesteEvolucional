@@ -18,7 +18,7 @@ namespace Evolucional.Infrastructure.Persistence
                 await roleManager.CreateAsync(administratorRole);
             }
 
-            var defaultUser = new ApplicationUser { UserName = "candidato-evolucional", Email = "candidato-evolucional@evolucional.com" };
+            var defaultUser = new ApplicationUser { UserName = "candidato-evolucional", Email = "candidato-evolucional" };
 
             if (userManager.Users.All(u => u.UserName != defaultUser.UserName))
             {
