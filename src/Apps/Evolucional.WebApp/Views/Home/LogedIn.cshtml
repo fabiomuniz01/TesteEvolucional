@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "_LayoutLogedIn";
+}
+@using (@Html.BeginForm())
+{
+    <section class="card">
+        <header class="card-header">
+            <div class="card-actions">
+                <a href="#" class="card-action card-action-toggle" data-card-toggle=""></a>
+                <a href="#" class="card-action card-action-dismiss" data-card-dismiss=""></a>
+            </div>
+
+            <h2 class="card-title">Página de execução do código</h2>
+        </header>
+        <div class="card-body">
+            <button type="submit" class="mb-1 mt-1 mr-1 btn btn-primary" formaction=@Url.Action("BotaoUm","Home", new {token = ViewBag.Token})>Botão 1</button>
+            <button type="submit" class="mb-1 mt-1 mr-1 btn btn-success" formaction=@Url.Action("BotaoDois","Home", new {token = ViewBag.Token})>Botão 2</button>
+        </div>
+    </section>
+}
+
+@section Css{
+    <link href="~/js/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="~/js/pnotify/pnotify.custom.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/js/pnotify/pnotify.custom.js"></script>
+    <script src="~/js/jquery-validation/jquery.validate.js"></script>
+
+    <script>
+        (function ($) {
+
+            'use strict';
+
+            $("#form").validate({
+                highlight: function (label) {
+                    $(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+                },
+                success: function (label) {
+                    $(label).closest('.form-group').removeClass('has-error');
+                    label.remove();
+                },
+                errorPlacement: function (error, element) {
+                    var placement = element.closest('.input-group');
+                    if (!placement.get(0)) {
+                        placement = element;
+                    }
+                    if (error.text() !== '') {
+                        placement.after(error);
+                    }
+                }
+            });
+
+        }).apply(this, [jQuery]);
+        // mensagens e notificaçoes
+        (function ($) {
+
+            'use strict';
+            var notify = @ViewBag.NotifyMessage;
+            var messagem = '@ViewBag.Notify';
+
+            if (notify===0) {
+                new PNotify({
+                    title: 'Login',
+                    text: messagem,
+                    type: 'success'
+                });
+            }else if (notify === 1) {
+                new PNotify({
+                    title: 'Login',
+                    text: messagem,
+                    type: 'warning'
+                });
+            }else if (notify === 2) {
+                new PNotify({
+                    title: 'Login',
+                    text: messagem,
+                    type: 'error'
+                });
+            }
+
+
+
+        }).apply(this, [jQuery]);
+    </script>
+}

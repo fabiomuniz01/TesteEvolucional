@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Readme";
+}
+<div id="readme" class="Box-body readme blob js-code-block-container p-5 p-xl-6 gist-border-0">
+    <article class="markdown-body entry-content container-lg" itemprop="text">
+        <h1>
+            Teste Evolucional - Fábio Muniz
+        </h1>
+        <p>
+            Este é um modelo de solução para a criação de uma API da Web ASP.NET Core seguindo os princípios da Arquitetura Limpa.
+        </p>
+        <h2>
+            Tecnologias
+        </h2>
+        <ul>
+            <li>.NET 5.0.x</li>
+            <li>ASP .NET 5.0.x</li>
+            <li>Entity Framework Core 5.0.x</li>
+            <li>MediatR</li>
+            <li>Mapster</li>
+            <li>FluentValidation</li>
+            <li>Elasticsearch, Serilog, Kibana</li>
+        </ul>
+
+        <h3>
+            Configuracao de Banco de Dados
+        </h3>
+        <p>O modelo é configurado para usar um banco de dados na memória por padrão. Isso garante que todos os usuários serão capazes de executar a 
+            solução sem a necessidade de configurar uma infraestrutura adicional (por exemplo, SQL Server).</p>
+        <p>Se você quiser usar o SQL Server, você precisará atualizar <strong>WebApi/appsettings.json</strong> conforme abaixo:</p>
+        <div class="highlight highlight-source-json position-relative">
+            <pre>  <span class="pl-s"><span class="pl-pds">"</span>UseInMemoryDatabase<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>,</pre><div class="zeroclipboard-container position-absolute right-0 top-0">
+            </div>
+        </div>
+        <p>Verifique se o <strong>DefaultConnection</strong> string de conexão dentro do <strong>appsettings.json</strong> aponta para uma instância válida do SQL Server.</p>
+        <p>Ao executar o aplicativo, o banco de dados será criado automaticamente (se necessário) e as migrações mais recentes serão aplicadas.</p>
+        
+        <h2>Overview</h2>
+        <h3>Domain</h3>
+        <p>Aqui contém todas as entidades, enums, exceções, interfaces, tipos e lógicas específicas para a camada de domínio.</p>
+        <h3>Application</h3>
+        <p>Esta camada contém toda a lógica do aplicativo. Depende da camada de domínio, mas não depende de 
+            nenhuma outra camada ou projeto. Esta camada define interfaces que são implementadas por camadas externas. 
+            Por exemplo, se o aplicativo precisar acessar um serviço de notificação, uma nova interface seria adicionada ao aplicativo 
+            e uma implementação seria criada dentro da infraestrutura. </p>
+        <h3>Infrastructure</h3>
+        <p>
+            Esta camada contém classes para acessar recursos externos, como sistemas de arquivos,
+            serviços da web, smtp e assim por diante. Essas classes devem ser baseadas em interfaces definidas na camada de aplicativo.
+        </p>
+        <h3>WebApi</h3>
+        <p>
+            Esta camada é uma web API  baseado em ASP.NET 5.0.x. Esta camada depende das camadas de aplicativo e infraestrutura, no entanto,
+            a dependência da infraestrutura serve apenas para oferecer suporte à injeção de dependência. Portanto, apenas <em> Startup.cs </em> deve fazer referência a Infraestrutura.
+        </p>
+        <h3>WebApp</h3>
+        <p>
+            Esta camada é uma web App  baseado em ASP.NET 5.0.x. Esta camada depende somente da classe client gerada pelo nSwag.
+        </p>
+        <h3>Logs</h3>
+        <p>Login no Elasticsearch usando Serilog e visualização de registros em Kibana.</p>
+    </article>
+</div>
