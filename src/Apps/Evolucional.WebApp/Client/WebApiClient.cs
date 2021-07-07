@@ -1602,8 +1602,11 @@ namespace Evolucional.WebApp.Client
         [Newtonsoft.Json.JsonProperty("valor", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public decimal Valor { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("disciplinaId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int DisciplinaId { get; set; }
+        [Newtonsoft.Json.JsonProperty("disciplina", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public DisciplinaDto Disciplina { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("aluno", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public AlunoDto Aluno { get; set; }
     
         public string ToJson() 
         {
@@ -1620,8 +1623,8 @@ namespace Evolucional.WebApp.Client
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class GetAllNotasComPaginacaoQuery 
     {
-        [Newtonsoft.Json.JsonProperty("disciplinaId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int DisciplinaId { get; set; }
+        [Newtonsoft.Json.JsonProperty("alunoId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int AlunoId { get; set; }
     
         [Newtonsoft.Json.JsonProperty("pageNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int PageNumber { get; set; }

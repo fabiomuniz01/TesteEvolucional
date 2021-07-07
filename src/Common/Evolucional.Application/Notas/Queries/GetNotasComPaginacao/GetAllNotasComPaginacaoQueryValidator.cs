@@ -6,9 +6,9 @@ namespace Evolucional.Application.Notas.Queries.GetNotasComPaginacao
     {
         public GetAllNotasComPaginacaoQueryValidator()
         {
-            RuleFor(x=>x.DisciplinaId)
+            RuleFor(x=>x.AlunoId)
                 .NotNull()
-                .NotEmpty().WithMessage("DisciplinaId é necessário.");
+                .NotEmpty().WithMessage("AlunoId é necessário.");
 
             RuleFor(x => x.PageNumber)
                 .GreaterThanOrEqualTo(1).WithMessage("Número da página pelo menos maior ou igual a 1.");

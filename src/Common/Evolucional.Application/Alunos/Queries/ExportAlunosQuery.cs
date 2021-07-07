@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Evolucional.Application.Alunos.Queries
 {
-    [Authorize(Roles = "Administrator")]
     public class ExportAlunosQuery : IRequest<ExportDto>
     {
     }

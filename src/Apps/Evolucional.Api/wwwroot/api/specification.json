@@ -678,9 +678,21 @@
             "type": "number",
             "format": "decimal"
           },
-          "disciplinaId": {
-            "type": "integer",
-            "format": "int32"
+          "disciplina": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DisciplinaDto"
+              }
+            ]
+          },
+          "aluno": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AlunoDto"
+              }
+            ]
           }
         }
       },
@@ -688,7 +700,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "disciplinaId": {
+          "alunoId": {
             "type": "integer",
             "format": "int32"
           },

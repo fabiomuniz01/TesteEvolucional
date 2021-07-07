@@ -12,7 +12,7 @@ namespace Evolucional.Application.Notas.Queries.GetNotasComPaginacao
 {
     public class GetAllNotasComPaginacaoQuery : IRequestWrapper<PaginatedList<NotaDto>>
     {
-        public int DisciplinaId { get; set; }
+        public int AlunoId { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
@@ -31,8 +31,8 @@ namespace Evolucional.Application.Notas.Queries.GetNotasComPaginacao
         public async Task<ServiceResult<PaginatedList<NotaDto>>> Handle(GetAllNotasComPaginacaoQuery request, CancellationToken cancellationToken)
         {
             PaginatedList<NotaDto> list = await _context.Notas
-                .Where(x => x.DisciplinaId == request.DisciplinaId)
-                .OrderBy(o => o.Valor)
+                .Where(x => x.AlunoId == request.AlunoId)
+                .OrderBy(o => o.DisciplinaId)
                 .ProjectToType<NotaDto>(_mapper.Config)
                 .PaginatedListAsync(request.PageNumber, request.PageSize);
 
